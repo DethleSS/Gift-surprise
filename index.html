@@ -2,57 +2,101 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>🎁 Сюрприз</title>
+  <title>Последняя коробка 🎁</title>
 
   <style>
     body {
       margin: 0;
       background: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      height: 100vh;
+
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      font-family: Arial;
+      flex-direction: column;
       overflow: hidden;
     }
 
+    #startBtn {
+      font-size: 24px;
+      padding: 18px 40px;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+
+      background: white;
+      color: black;
+
+      transition: 0.25s;
+    }
+
+    #startBtn:hover {
+      transform: scale(1.08);
+    }
+
     video {
-      max-width: 90vw;
-      max-height: 90vh;
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
     }
 
     #popup {
-      position: fixed;
-      bottom: 40px;
-      background: white;
-      padding: 20px 35px;
-      border-radius: 14px;
-      font-size: 22px;
       display: none;
-      box-shadow: 0 10px 40px rgba(0,0,0,.5);
-      animation: fadeIn .6s ease;
-    }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+      background: white;
+      color: black;
+      padding: 30px 40px;
+      border-radius: 16px;
+
+      font-size: 22px;
+      text-align: center;
+
+      box-shadow: 0 0 40px rgba(0,0,0,0.6);
+      z-index: 10;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- ВАЖНО: muted + playsinline -->
-  <video id="vid" autoplay muted playsinline>
+  <button id="startBtn">
+    🎁 Открыть последнюю коробку
+  </button>
+
+  <video id="vid" playsinline>
     <source src="./video.mp4" type="video/mp4">
   </video>
 
-  <div id="popup">А ты точно внимательно посмотрела все коробки? 😏</div>
+  <div id="popup">
+    А ты точно внимательно посмотрела все коробки? 😏
+  </div>
 
   <script>
-    setTimeout(() => {
-      document.getElementById('popup').style.display = 'block'
-    }, 10000)
+    const btn = document.getElementById('startBtn')
+    const vid = document.getElementById('vid')
+    const popup = document.getElementById('popup')
+
+    btn.onclick = async () => {
+      btn.style.display = 'none'
+      vid.style.display = 'block'
+
+      vid.muted = false
+      vid.volume = 1
+
+      await vid.play()
+
+      setTimeout(() => {
+        popup.style.display = 'block'
+      }, 10000)
+    }
   </script>
 
 </body>
