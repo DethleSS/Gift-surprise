@@ -2,65 +2,109 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Последняя коробка 🎁</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <title>🎁 Последняя коробка</title>
 
   <style>
     body {
       margin: 0;
       background: black;
-      color: white;
-      font-family: Arial, sans-serif;
-      height: 100vh;
-
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
       overflow: hidden;
     }
 
+    /* ---------- КНОПКА ---------- */
     #startBtn {
-      font-size: 24px;
-      padding: 18px 40px;
-      border-radius: 16px;
+      position: absolute;
+      inset: 0;
+
+      width: 100vw;
+      height: 100vh;
+
+      font-size: 34px;
+      font-weight: bold;
+
+      background: linear-gradient(135deg,#ffffff,#eaeaea);
+      color: black;
+
       border: none;
       cursor: pointer;
 
-      background: white;
-      color: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-      transition: 0.25s;
+      text-align: center;
+      padding: 40px;
+
+      transition: 0.3s;
     }
 
-    #startBtn:hover {
-      transform: scale(1.08);
+    #startBtn:active {
+      transform: scale(0.97);
     }
 
+    /* ---------- ВИДЕО ---------- */
     video {
       display: none;
+      position: fixed;
+
       width: 100vw;
       height: 100vh;
+
       object-fit: cover;
+      background: black;
     }
 
+    /* ---------- ЗАТЕМНЕНИЕ ---------- */
+    #overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(6px);
+
+      z-index: 5;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    /* ---------- POPUP ---------- */
     #popup {
       display: none;
 
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(0.9);
 
       background: white;
       color: black;
-      padding: 30px 40px;
-      border-radius: 16px;
 
-      font-size: 22px;
+      width: 85%;
+      max-width: 420px;
+
+      padding: 40px 30px;
+
+      font-size: 26px;
+      font-weight: 600;
+
+      border-radius: 28px;
       text-align: center;
 
-      box-shadow: 0 0 40px rgba(0,0,0,0.6);
+      box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+
       z-index: 10;
+
+      opacity: 0;
+      transition: 0.4s;
+    }
+
+    #popup.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
     }
   </style>
 </head>
@@ -75,14 +119,18 @@
     <source src="./video.mp4" type="video/mp4">
   </video>
 
+  <div id="overlay"></div>
+
   <div id="popup">
-    А ты точно внимательно посмотрела все коробки? 😏
+    А ты точно внимательно<br>посмотрела все коробки? 😏
   </div>
+
 
   <script>
     const btn = document.getElementById('startBtn')
     const vid = document.getElementById('vid')
     const popup = document.getElementById('popup')
+    const overlay = document.getElementById('overlay')
 
     btn.onclick = async () => {
       btn.style.display = 'none'
@@ -93,8 +141,18 @@
 
       await vid.play()
 
+      // через 10 секунд магия
       setTimeout(() => {
+        vid.volume = 0.15   // приглушаем звук
+
+        overlay.style.display = 'block'
         popup.style.display = 'block'
+
+        requestAnimationFrame(() => {
+          overlay.style.opacity = '1'
+          popup.classList.add('show')
+        })
+
       }, 10000)
     }
   </script>
