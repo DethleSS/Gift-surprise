@@ -1,161 +1,181 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-  <title>🎁 Последняя коробка</title>
+<title>🎁 Последняя коробка</title>
 
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      overflow: hidden;
-    }
+<style>
+  body {
+    margin: 0;
+    background: #0b0b0b;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow: hidden;
+    color: white;
+  }
 
-    /* ---------- КНОПКА ---------- */
-    #startBtn {
-      position: absolute;
-      inset: 0;
+  /* ---------- СТАРТОВЫЙ ЭКРАН ---------- */
+  #startScreen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at center, #1a1a1a, #000);
+  }
 
-      width: 100vw;
-      height: 100vh;
+  /* БОЛЬШАЯ КНОПКА */
+  #startBtn {
+    width: 85%;
+    height: 28dvh;
 
-      font-size: 34px;
-      font-weight: bold;
+    font-size: 30px;
+    font-weight: 700;
 
-      background: linear-gradient(135deg,#ffffff,#eaeaea);
-      color: black;
+    border-radius: 30px;
+    border: none;
 
-      border: none;
-      cursor: pointer;
+    background: linear-gradient(135deg,#ffffff,#e8e8e8);
+    color: black;
 
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    box-shadow:
+      0 15px 40px rgba(0,0,0,.6),
+      inset 0 2px 4px rgba(255,255,255,.6);
 
-      text-align: center;
-      padding: 40px;
+    transition: .25s;
+  }
 
-      transition: 0.3s;
-    }
+  #startBtn:active {
+    transform: scale(.96);
+  }
 
-    #startBtn:active {
-      transform: scale(0.97);
-    }
+  /* ---------- ВИДЕО ---------- */
+  video {
+    display: none;
+    position: fixed;
+    inset: 0;
 
-    /* ---------- ВИДЕО ---------- */
-    video {
-      display: none;
-      position: fixed;
+    width: 100vw;
+    height: 100dvh;
 
-      width: 100vw;
-      height: 100vh;
+    object-fit: contain; /* ← ВАЖНО: теперь без обрезки */
+    background: black;
+  }
 
-      object-fit: cover;
-      background: black;
-    }
+  /* ---------- ЗАТЕМНЕНИЕ ---------- */
+  #overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
 
-    /* ---------- ЗАТЕМНЕНИЕ ---------- */
-    #overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(10px);
 
-      background: rgba(0,0,0,0.65);
-      backdrop-filter: blur(6px);
+    opacity: 0;
+    transition: opacity .5s;
 
-      z-index: 5;
-      opacity: 0;
-      transition: opacity 0.5s;
-    }
+    z-index: 5;
+  }
 
-    /* ---------- POPUP ---------- */
-    #popup {
-      display: none;
+  /* ---------- POPUP ---------- */
+  #popup {
+    display: none;
 
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.9);
+    position: fixed;
+    top: 50%;
+    left: 50%;
 
-      background: white;
-      color: black;
+    transform: translate(-50%, -50%) scale(.8);
 
-      width: 85%;
-      max-width: 420px;
+    width: 88%;
+    max-width: 440px;
 
-      padding: 40px 30px;
+    padding: 45px 25px;
 
-      font-size: 26px;
-      font-weight: 600;
+    background: white;
+    color: black;
 
-      border-radius: 28px;
-      text-align: center;
+    font-size: 28px;
+    font-weight: 700;
 
-      box-shadow: 0 25px 70px rgba(0,0,0,0.6);
+    border-radius: 32px;
+    text-align: center;
 
-      z-index: 10;
+    box-shadow: 0 30px 80px rgba(0,0,0,.7);
 
-      opacity: 0;
-      transition: 0.4s;
-    }
+    opacity: 0;
+    transition: .45s;
 
-    #popup.show {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-  </style>
+    z-index: 10;
+  }
+
+  #popup.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+</style>
 </head>
 
 <body>
 
+<div id="startScreen">
   <button id="startBtn">
     🎁 Открыть последнюю коробку
   </button>
+</div>
 
-  <video id="vid" playsinline>
-    <source src="./video.mp4" type="video/mp4">
-  </video>
+<video id="vid" playsinline>
+  <source src="./video.mp4" type="video/mp4">
+</video>
 
-  <div id="overlay"></div>
+<div id="overlay"></div>
 
-  <div id="popup">
-    А ты точно внимательно<br>посмотрела все коробки? 😏
-  </div>
+<div id="popup">
+  А ты точно внимательно<br>посмотрела все коробки? 😏
+</div>
 
 
-  <script>
-    const btn = document.getElementById('startBtn')
-    const vid = document.getElementById('vid')
-    const popup = document.getElementById('popup')
-    const overlay = document.getElementById('overlay')
+<script>
+const btn = document.getElementById('startBtn')
+const startScreen = document.getElementById('startScreen')
+const vid = document.getElementById('vid')
+const popup = document.getElementById('popup')
+const overlay = document.getElementById('overlay')
 
-    btn.onclick = async () => {
-      btn.style.display = 'none'
-      vid.style.display = 'block'
+btn.onclick = async () => {
 
-      vid.muted = false
-      vid.volume = 1
+  // легкая вибрация при нажатии
+  if (navigator.vibrate) navigator.vibrate(40)
 
-      await vid.play()
+  startScreen.style.display = 'none'
 
-      // через 10 секунд магия
-      setTimeout(() => {
-        vid.volume = 0.15   // приглушаем звук
+  vid.style.display = 'block'
+  vid.muted = false
+  vid.volume = 1
 
-        overlay.style.display = 'block'
-        popup.style.display = 'block'
+  await vid.play()
 
-        requestAnimationFrame(() => {
-          overlay.style.opacity = '1'
-          popup.classList.add('show')
-        })
+  // через 10 секунд — магия
+  setTimeout(() => {
 
-      }, 10000)
-    }
-  </script>
+    // приглушаем звук
+    vid.volume = 0.15
+
+    // сильная вибрация для эффекта
+    if (navigator.vibrate) navigator.vibrate([200,100,200])
+
+    overlay.style.display = 'block'
+    popup.style.display = 'block'
+
+    requestAnimationFrame(() => {
+      overlay.style.opacity = '1'
+      popup.classList.add('show')
+    })
+
+  }, 10000)
+}
+</script>
 
 </body>
 </html>
