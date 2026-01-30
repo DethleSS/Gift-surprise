@@ -7,113 +7,131 @@
 <title>🎁 Последняя коробка</title>
 
 <style>
-  body {
-    margin: 0;
-    background: #0b0b0b;
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    overflow: hidden;
-    color: white;
-  }
+body {
+  margin: 0;
+  background: #0b0b0b;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow: hidden;
+  color: white;
+}
 
-  /* ---------- СТАРТОВЫЙ ЭКРАН ---------- */
-  #startScreen {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(circle at center, #1a1a1a, #000);
-  }
+/* ---------- СТАРТ ---------- */
+#startScreen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, #1a1a1a, #000);
+}
 
-  /* БОЛЬШАЯ КНОПКА */
-  #startBtn {
-    width: 85%;
-    height: 28dvh;
+#startBtn {
+  width: 85%;
+  height: 28dvh;
+  font-size: 30px;
+  font-weight: 700;
+  border-radius: 30px;
+  border: none;
 
-    font-size: 30px;
-    font-weight: 700;
+  background: linear-gradient(135deg,#ffffff,#e8e8e8);
+  color: black;
 
-    border-radius: 30px;
-    border: none;
+  box-shadow:
+    0 15px 40px rgba(0,0,0,.6),
+    inset 0 2px 4px rgba(255,255,255,.6);
 
-    background: linear-gradient(135deg,#ffffff,#e8e8e8);
-    color: black;
+  transition: .25s;
+}
 
-    box-shadow:
-      0 15px 40px rgba(0,0,0,.6),
-      inset 0 2px 4px rgba(255,255,255,.6);
+#startBtn:active {
+  transform: scale(.96);
+}
 
-    transition: .25s;
-  }
+/* ---------- ВИДЕО ---------- */
+video {
+  display: none;
+  position: fixed;
+  inset: 0;
 
-  #startBtn:active {
-    transform: scale(.96);
-  }
+  width: 100vw;
+  height: 100dvh;
 
-  /* ---------- ВИДЕО ---------- */
-  video {
-    display: none;
-    position: fixed;
-    inset: 0;
+  object-fit: contain;
+  background: black;
+}
 
-    width: 100vw;
-    height: 100dvh;
+/* ---------- ЗАТЕМНЕНИЕ ---------- */
+#overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
 
-    object-fit: contain; /* ← ВАЖНО: теперь без обрезки */
-    background: black;
-  }
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(10px);
 
-  /* ---------- ЗАТЕМНЕНИЕ ---------- */
-  #overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
+  opacity: 0;
+  transition: opacity .5s;
 
-    background: rgba(0,0,0,0.75);
-    backdrop-filter: blur(10px);
+  z-index: 5;
+}
 
-    opacity: 0;
-    transition: opacity .5s;
+/* ---------- ОБЩИЙ POPUP ---------- */
+.popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(.85);
 
-    z-index: 5;
-  }
+  width: 90%;
+  max-width: 420px;
 
-  /* ---------- POPUP ---------- */
-  #popup {
-    display: none;
+  padding: 30px;
 
-    position: fixed;
-    top: 50%;
-    left: 50%;
+  background: white;
+  color: black;
 
-    transform: translate(-50%, -50%) scale(.8);
+  border-radius: 28px;
+  text-align: center;
 
-    width: 88%;
-    max-width: 440px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.7);
 
-    padding: 45px 25px;
+  opacity: 0;
+  transition: .35s;
 
-    background: white;
-    color: black;
+  z-index: 10;
+}
 
-    font-size: 28px;
-    font-weight: 700;
+.popup.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
 
-    border-radius: 32px;
-    text-align: center;
+/* ---------- МАТЕМАТИКА ---------- */
+.math {
+  font-size: 20px;
+  margin: 18px 0 22px;
+}
 
-    box-shadow: 0 30px 80px rgba(0,0,0,.7);
+.answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
 
-    opacity: 0;
-    transition: .45s;
+.answers button {
+  padding: 12px;
+  font-size: 18px;
+  border-radius: 12px;
+  border: none;
+  background: #eee;
+}
 
-    z-index: 10;
-  }
-
-  #popup.show {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+/* ---------- ФИНАЛ ---------- */
+.finalText {
+  font-size: 24px;
+  font-weight: 700;
+}
 </style>
 </head>
 
@@ -131,47 +149,89 @@
 
 <div id="overlay"></div>
 
-<div id="popup">
-  А ты точно внимательно<br>посмотрела все коробки? 😏
+<!-- Математический popup -->
+<div id="mathPopup" class="popup">
+  <h2>Подожди…</h2>
+  <p style="opacity:.7">Реши пример чтобы продолжить</p>
+
+  <div class="math">
+    log₂(256) × √144 + 7³ − (15 ÷ 3) =
+  </div>
+
+  <div class="answers">
+    <button>42</button>
+    <button>128</button>
+    <button>731</button>
+    <button>96</button>
+    <button>512</button>
+    <button>37</button>
+    <button>404</button>
+    <button>81</button>
+    <button>999</button>
+    <button>???</button>
+  </div>
 </div>
 
+<!-- Финальный popup -->
+<div id="finalPopup" class="popup">
+  <div class="finalText">
+    Ладно… 😅<br><br>
+    Не буду грузить математикой<br><br>
+    Ты точно внимательно посмотрела<br>
+    <b>ВСЕ коробки?</b> 🎁
+  </div>
+</div>
 
 <script>
 const btn = document.getElementById('startBtn')
 const startScreen = document.getElementById('startScreen')
 const vid = document.getElementById('vid')
-const popup = document.getElementById('popup')
 const overlay = document.getElementById('overlay')
+
+const mathPopup = document.getElementById('mathPopup')
+const finalPopup = document.getElementById('finalPopup')
 
 btn.onclick = async () => {
 
-  // легкая вибрация при нажатии
   if (navigator.vibrate) navigator.vibrate(40)
 
   startScreen.style.display = 'none'
 
   vid.style.display = 'block'
-  vid.muted = false
   vid.volume = 1
 
   await vid.play()
 
-  // через 10 секунд — магия
+  // через 10 сек показываем "сложную математику"
   setTimeout(() => {
 
-    // приглушаем звук
     vid.volume = 0.15
-
-    // сильная вибрация для эффекта
     if (navigator.vibrate) navigator.vibrate([200,100,200])
 
     overlay.style.display = 'block'
-    popup.style.display = 'block'
+    mathPopup.style.display = 'block'
 
     requestAnimationFrame(() => {
       overlay.style.opacity = '1'
-      popup.classList.add('show')
+      mathPopup.classList.add('show')
     })
+
+    // через 5 сек убираем и показываем финал
+    setTimeout(() => {
+
+      mathPopup.classList.remove('show')
+
+      setTimeout(() => {
+        mathPopup.style.display = 'none'
+        finalPopup.style.display = 'block'
+
+        requestAnimationFrame(() => {
+          finalPopup.classList.add('show')
+        })
+
+      }, 300)
+
+    }, 5000)
 
   }, 10000)
 }
