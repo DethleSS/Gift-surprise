@@ -199,6 +199,7 @@ btn.onclick = async () => {
 
   await vid.play()
 
+  // через 10с начинается "магия"
   setTimeout(()=>{
 
     vid.volume = 0.15
@@ -209,20 +210,18 @@ btn.onclick = async () => {
 
     show(mathPopup)
 
-    // 5с математика
+    // 5 секунд математика
     setTimeout(()=>{
+
       hide(mathPopup)
 
-      // +4с пауза
+      // 🔥 СРАЗУ показываем midPopup (без задержки)
+      show(midPopup)
+
+      // ещё 4 секунды → финал
       setTimeout(()=>{
-        show(midPopup)
-
-        // +4с → финал
-        setTimeout(()=>{
-          hide(midPopup)
-          show(finalPopup)
-        },4000)
-
+        hide(midPopup)
+        show(finalPopup)
       },4000)
 
     },5000)
