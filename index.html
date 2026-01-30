@@ -32,14 +32,11 @@ body {
   font-weight: 700;
   border-radius: 30px;
   border: none;
-
   background: linear-gradient(135deg,#ffffff,#e8e8e8);
   color: black;
-
   box-shadow:
     0 15px 40px rgba(0,0,0,.6),
     inset 0 2px 4px rgba(255,255,255,.6);
-
   transition: .25s;
 }
 
@@ -52,10 +49,8 @@ video {
   display: none;
   position: fixed;
   inset: 0;
-
   width: 100vw;
   height: 100dvh;
-
   object-fit: contain;
   background: black;
 }
@@ -65,13 +60,10 @@ video {
   display: none;
   position: fixed;
   inset: 0;
-
   background: rgba(0,0,0,0.75);
   backdrop-filter: blur(10px);
-
   opacity: 0;
   transition: opacity .5s;
-
   z-index: 5;
 }
 
@@ -82,23 +74,16 @@ video {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(.85);
-
   width: 90%;
   max-width: 420px;
-
   padding: 30px;
-
   background: white;
   color: black;
-
   border-radius: 28px;
   text-align: center;
-
   box-shadow: 0 30px 80px rgba(0,0,0,.7);
-
   opacity: 0;
   transition: .35s;
-
   z-index: 10;
 }
 
@@ -149,7 +134,7 @@ video {
 
 <div id="overlay"></div>
 
-<!-- Математический popup -->
+<!-- Математика -->
 <div id="mathPopup" class="popup">
   <h2>Подожди…</h2>
   <p style="opacity:.7">Реши пример чтобы продолжить</p>
@@ -159,24 +144,25 @@ video {
   </div>
 
   <div class="answers">
-    <button>42</button>
-    <button>128</button>
-    <button>731</button>
-    <button>96</button>
-    <button>512</button>
-    <button>37</button>
-    <button>404</button>
-    <button>81</button>
-    <button>999</button>
-    <button>???</button>
+    <button>42</button><button>128</button>
+    <button>731</button><button>96</button>
+    <button>512</button><button>37</button>
+    <button>404</button><button>81</button>
+    <button>999</button><button>???</button>
   </div>
 </div>
 
-<!-- Финальный popup -->
-<div id="finalPopup" class="popup">
+<!-- ПРОМЕЖУТОЧНЫЙ -->
+<div id="midPopup" class="popup">
   <div class="finalText">
     Ладно… 😅<br><br>
-    Не буду грузить математикой<br><br>
+    Не буду грузить математикой
+  </div>
+</div>
+
+<!-- ФИНАЛ -->
+<div id="finalPopup" class="popup">
+  <div class="finalText">
     Ты точно внимательно посмотрела<br>
     <b>ВСЕ коробки?</b> 🎁
   </div>
@@ -189,51 +175,59 @@ const vid = document.getElementById('vid')
 const overlay = document.getElementById('overlay')
 
 const mathPopup = document.getElementById('mathPopup')
+const midPopup = document.getElementById('midPopup')
 const finalPopup = document.getElementById('finalPopup')
+
+function show(el){
+  el.style.display='block'
+  requestAnimationFrame(()=>el.classList.add('show'))
+}
+
+function hide(el){
+  el.classList.remove('show')
+  setTimeout(()=>el.style.display='none',300)
+}
 
 btn.onclick = async () => {
 
   if (navigator.vibrate) navigator.vibrate(40)
 
-  startScreen.style.display = 'none'
+  startScreen.style.display='none'
 
-  vid.style.display = 'block'
+  vid.style.display='block'
   vid.volume = 1
 
   await vid.play()
 
-  // через 10 сек показываем "сложную математику"
-  setTimeout(() => {
+  setTimeout(()=>{
 
     vid.volume = 0.15
     if (navigator.vibrate) navigator.vibrate([200,100,200])
 
-    overlay.style.display = 'block'
-    mathPopup.style.display = 'block'
+    overlay.style.display='block'
+    overlay.style.opacity='1'
 
-    requestAnimationFrame(() => {
-      overlay.style.opacity = '1'
-      mathPopup.classList.add('show')
-    })
+    show(mathPopup)
 
-    // через 5 сек убираем и показываем финал
-    setTimeout(() => {
+    // 5с математика
+    setTimeout(()=>{
+      hide(mathPopup)
 
-      mathPopup.classList.remove('show')
+      // +4с пауза
+      setTimeout(()=>{
+        show(midPopup)
 
-      setTimeout(() => {
-        mathPopup.style.display = 'none'
-        finalPopup.style.display = 'block'
+        // +4с → финал
+        setTimeout(()=>{
+          hide(midPopup)
+          show(finalPopup)
+        },4000)
 
-        requestAnimationFrame(() => {
-          finalPopup.classList.add('show')
-        })
+      },4000)
 
-      }, 300)
+    },5000)
 
-    }, 5000)
-
-  }, 10000)
+  },10000)
 }
 </script>
 
