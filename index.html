@@ -39,10 +39,7 @@ body {
     inset 0 2px 4px rgba(255,255,255,.6);
   transition: .25s;
 }
-
-#startBtn:active {
-  transform: scale(.96);
-}
+#startBtn:active { transform: scale(.96); }
 
 /* ---------- ВИДЕО ---------- */
 video {
@@ -67,7 +64,7 @@ video {
   z-index: 5;
 }
 
-/* ---------- ОБЩИЙ POPUP ---------- */
+/* ---------- POPUP ---------- */
 .popup {
   display: none;
   position: fixed;
@@ -92,7 +89,6 @@ video {
   transform: translate(-50%, -50%) scale(1);
 }
 
-/* ---------- МАТЕМАТИКА ---------- */
 .math {
   font-size: 20px;
   margin: 18px 0 22px;
@@ -112,10 +108,17 @@ video {
   background: #eee;
 }
 
-/* ---------- ФИНАЛ ---------- */
 .finalText {
   font-size: 24px;
   font-weight: 700;
+}
+
+/* ---------- CONFETTI CANVAS ---------- */
+#confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
 }
 </style>
 </head>
@@ -133,6 +136,8 @@ video {
 </video>
 
 <div id="overlay"></div>
+
+<canvas id="confetti"></canvas>
 
 <!-- Математика -->
 <div id="mathPopup" class="popup">
@@ -178,6 +183,7 @@ const mathPopup = document.getElementById('mathPopup')
 const midPopup = document.getElementById('midPopup')
 const finalPopup = document.getElementById('finalPopup')
 
+/* ---------- helpers ---------- */
 function show(el){
   el.style.display='block'
   requestAnimationFrame(()=>el.classList.add('show'))
@@ -188,6 +194,66 @@ function hide(el){
   setTimeout(()=>el.style.display='none',300)
 }
 
+/* =========================
+   ❤️🎁 EMOJI CONFETTI
+========================= */
+const canvas = document.getElementById('confetti')
+const ctx = canvas.getContext('2d')
+
+const emojis = ['❤️','🎁','💖','✨']
+let pieces=[]
+let anim
+
+function resize(){
+  canvas.width = innerWidth
+  canvas.height = innerHeight
+}
+resize()
+window.onresize = resize
+
+function startConfetti(){
+
+  pieces=[]
+
+  for(let i=0;i<120;i++){
+    pieces.push({
+      x: Math.random()*canvas.width,
+      y: -20,
+      size: 20 + Math.random()*20,
+      speed: 2 + Math.random()*3,
+      swing: Math.random()*2,
+      angle: Math.random()*Math.PI,
+      emoji: emojis[Math.floor(Math.random()*emojis.length)]
+    })
+  }
+
+  const start = Date.now()
+
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height)
+
+    pieces.forEach(p=>{
+      p.y += p.speed
+      p.x += Math.sin(p.angle+=0.05)*p.swing
+
+      ctx.font = p.size+'px serif'
+      ctx.fillText(p.emoji,p.x,p.y)
+    })
+
+    if(Date.now()-start < 3000){
+      anim=requestAnimationFrame(draw)
+    } else {
+      cancelAnimationFrame(anim)
+      ctx.clearRect(0,0,canvas.width,canvas.height)
+    }
+  }
+
+  draw()
+}
+
+/* =========================
+   MAIN FLOW
+========================= */
 btn.onclick = async () => {
 
   if (navigator.vibrate) navigator.vibrate(40)
@@ -199,7 +265,6 @@ btn.onclick = async () => {
 
   await vid.play()
 
-  // через 10с начинается "магия"
   setTimeout(()=>{
 
     vid.volume = 0.15
@@ -210,18 +275,18 @@ btn.onclick = async () => {
 
     show(mathPopup)
 
-    // 5 секунд математика
     setTimeout(()=>{
 
       hide(mathPopup)
-
-      // 🔥 СРАЗУ показываем midPopup (без задержки)
       show(midPopup)
 
-      // ещё 4 секунды → финал
       setTimeout(()=>{
         hide(midPopup)
         show(finalPopup)
+
+        // 🎉 через 2с дождь сердечек/подарков
+        setTimeout(startConfetti,2000)
+
       },4000)
 
     },5000)
