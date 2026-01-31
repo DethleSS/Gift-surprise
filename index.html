@@ -180,6 +180,21 @@ border-radius:10px;
 </button>
 </div>
 
+<!-- PRE VIDEO (обязательно для iPhone autoplay) -->
+<div id="preVideo" style="
+display:none;
+position:fixed;
+inset:0;
+align-items:center;
+justify-content:center;
+background:radial-gradient(circle,#1a1a1a,#000);
+z-index:15;
+">
+  <button id="realStartBtn" class="bigBtn">
+    🎬 Открыть сейчас
+  </button>
+</div>
+
 <!-- VIDEO -->
 <video id="vid" playsinline>
 <source src="./video.mp4" type="video/mp4">
@@ -292,27 +307,37 @@ if(y>innerHeight){el.remove();clearInterval(fall)}
 }
 setInterval(spawn,700)
 
-/* ================= VIDEO FLOW ================= */
-const btn=document.getElementById('startBtn')
-const vid=document.getElementById('vid')
-const overlay=document.getElementById('overlay')
-const mathPopup=document.getElementById('mathPopup')
-const midPopup=document.getElementById('midPopup')
-const finalPopup=document.getElementById('finalPopup')
+/* ================= VIDEO FLOW (FIX iPhone) ================= */
+const preVideo=document.getElementById('preVideo')
+const realStartBtn=document.getElementById('realStartBtn')
 
 btn.onclick=()=>{
 vibe([40,30,80])
 afterGame.style.display='none'
 
 fakeLoading(()=>{
-fakeError(async()=>{
+fakeError(()=>{
+
+// ❗ вместо автозапуска показываем кнопку
+preVideo.style.display='flex'
+
+})
+})
+}
+
+/* 🔥 только этот клик запускает видео */
+realStartBtn.onclick=async()=>{
+
+vibe([60,40,120])
+
+preVideo.style.display='none'
 
 vid.style.display='block'
-vid.muted=true
-await vid.play()
 vid.muted=false
+await vid.play()
 
 setTimeout(()=>{
+
 vid.volume=.15
 overlay.style.display='block'
 overlay.style.opacity='1'
@@ -333,9 +358,6 @@ startConfetti()
 },5000)
 
 },10000)
-
-})
-})
 }
 
 /* ================= CONFETTI ================= */
