@@ -227,7 +227,7 @@ document.body.appendChild(div)
 
 let w=0
 const t=setInterval(()=>{
-w+=5
+w+=1
 div.querySelector('#bar').style.width=w+'%'
 if(w>=100){clearInterval(t);div.remove();next()}
 },40)
@@ -241,7 +241,7 @@ d.style.display='block'
 d.innerHTML='❌ Ошибка<br><br>Подарок не найден<br><small>Исправляю…</small>'
 document.body.appendChild(d)
 
-setTimeout(()=>{d.remove();next()},900)
+setTimeout(()=>{d.remove();next()},4000)
 }
 
 /* ================= GAME LOGIC ================= */
