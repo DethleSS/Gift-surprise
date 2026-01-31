@@ -1,350 +1,360 @@
-    <!DOCTYPE html>
-    <html lang="ru">
-    <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>🎁 Последняя коробка</title>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>🎁 Последняя коробка</title>
 
-    <style>
-    html,body{
-    margin:0;
-    height:100%;
-    overflow:hidden;
-    overscroll-behavior:none;
-    touch-action:none;
-    background:#0b0b0b;
-    font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-    color:white;
-    }
-
-    /* ================= ОБЩИЕ КНОПКИ ================= */
-    .bigBtn{
-    width:85%;
-    height:26dvh;
-    font-size:30px;
-    font-weight:700;
-    border-radius:30px;
-    border:none;
-    background:linear-gradient(135deg,#fff,#e8e8e8);
-    color:black;
-    box-shadow:0 15px 40px rgba(0,0,0,.6);
-    }
-
-    /* ================= ПЕРВЫЙ ЭКРАН ================= */
-    #introScreen{
-    position:fixed;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:radial-gradient(circle,#1a1a1a,#000);
-    }
-
-    /* ================= GAME ================= */
-    #gameScreen{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:#000;
-    }
-
-    #gameText{
-    position:absolute;
-    top:20px;
-    width:100%;
-    text-align:center;
-    font-size:22px;
-    }
-
-    /* 🧺 корзина */
-    #bucket{
-    position:absolute;
-    bottom:25px;
-    width:110px;
-    height:70px;
-
-    background:linear-gradient(#caa472,#a37b49);
-    border-radius:20px 20px 30px 30px;
-
-    box-shadow:0 10px 25px rgba(0,0,0,.6);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-size:36px;
-    }
-
-    .fall{
-    position:absolute;
-    font-size:32px;
-    }
-
-    /* ================= ПОСЛЕ ИГРЫ ================= */
-    #afterGame{
-    display:none;
-    position:fixed;
-    inset:0;
-    align-items:center;
-    justify-content:center;
-    background:radial-gradient(circle,#1a1a1a,#000);
-    }
-
-    /* ================= VIDEO ================= */
-    video{
-    display:none;
-    position:fixed;
-    inset:0;
-    width:100vw;
-    height:100dvh;
-    object-fit:contain;
-    background:black;
-    }
-
-    /* ================= OVERLAY ================= */
-    #overlay{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.75);
-    backdrop-filter:blur(8px);
-    opacity:0;
-    transition:.4s;
-    z-index:5;
-    }
-
-    /* ================= POPUPS ================= */
-    .popup{
-    display:none;
-    position:fixed;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%) scale(.85);
-    width:90%;
-    max-width:420px;
-    padding:28px;
-    background:white;
-    color:black;
-    border-radius:26px;
-    text-align:center;
-    opacity:0;
-    transition:.35s;
-    z-index:10;
-    }
-
-    .popup.show{
-    opacity:1;
-    transform:translate(-50%,-50%) scale(1);
-    }
-
-    .answers{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-    margin-top:15px;
-    }
-
-    .answers button{
-    padding:10px;
-    border:none;
-    border-radius:10px;
-    }
-
-    /* ================= CONFETTI ================= */
-    #confetti{
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-    z-index:20;
-    }
-    </style>
-    </head>
-
-    <body>
-
-    <!-- ===== INTRO ===== -->
-    <div id="introScreen">
-    <button id="openGameBtn" class="bigBtn">Открыть 🎁</button>
-    </div>
-
-    <!-- ===== GAME ===== -->
-    <div id="gameScreen">
-    <div id="gameText">Поймай 8 подарков 🎁</div>
-    <div id="bucket">🧺</div>
-    </div>
-
-    <!-- ===== КНОПКА ПОСЛЕ ИГРЫ ===== -->
-    <div id="afterGame">
-    <button id="startBtn" class="bigBtn">🎁 Открыть последнюю коробку</button>
-    </div>
-
-    <!-- ===== VIDEO ===== -->
-    <video id="vid" playsinline>
-    <source src="./video.mp4" type="video/mp4">
-    </video>
-
-    <div id="overlay"></div>
-    <canvas id="confetti"></canvas>
-
-    <!-- ===== POPUPS ===== -->
-    <div id="mathPopup" class="popup">
-    <h2>Подожди…</h2>
-    <p style="opacity:.7">Реши пример чтобы продолжить</p>
-    log₂(256) × √144 + 7³ − (15 ÷ 3) =
-    <div class="answers">
-        <button>42</button><button>128</button>
-        <button>731</button><button>96</button>
-        <button>512</button><button>37</button>
-        <button>404</button><button>81</button>
-    </div>
-    </div>
-
-    <div id="midPopup" class="popup">
-    Ладно… 😅<br>Не буду грузить математикой
-    </div>
-
-    <div id="finalPopup" class="popup">
-    Ты точно внимательно посмотрела<br><b>ВСЕ коробки?</b> 🎁
-    </div>
-
-    <script>
-    function show(el){el.style.display='block';requestAnimationFrame(()=>el.classList.add('show'))}
-    function hide(el){el.classList.remove('show');setTimeout(()=>el.style.display='none',300)}
-
-    const intro=document.getElementById('introScreen')
-    const openGameBtn=document.getElementById('openGameBtn')
-    const game=document.getElementById('gameScreen')
-    const bucket=document.getElementById('bucket')
-    const afterGame=document.getElementById('afterGame')
-
-    /* ===== старт игры ===== */
-    openGameBtn.onclick=()=>{
-    intro.style.display='none'
-    game.style.display='block'
-    }
-
-    /* ===== логика игры ===== */
-    let caught=0
-    let bucketX=innerWidth/2-55
-    bucket.style.left=bucketX+'px'
-
-    function move(x){
-    bucketX=x-55
-    bucket.style.left=bucketX+'px'
-    }
-    game.ontouchmove=e=>move(e.touches[0].clientX)
-    game.onmousemove=e=>move(e.clientX)
-
-    function spawn(){
-    const el=document.createElement('div')
-    el.className='fall'
-    el.textContent='🎁'
-    el.style.left=Math.random()*innerWidth+'px'
-    el.style.top='-30px'
-    game.appendChild(el)
-
-    let y=0
-    const speed=3+Math.random()*2
-
-    const fall=setInterval(()=>{
-        y+=speed
-        el.style.top=y+'px'
-
-        if(y>innerHeight-100){
-        const ex=parseFloat(el.style.left)
-        if(ex>bucketX && ex<bucketX+110){
-            caught++
-            el.remove()
-            clearInterval(fall)
-            if(caught>=8){
-            game.style.display='none'
-            afterGame.style.display='flex'
-            }
-        }
-        }
-
-        if(y>innerHeight){el.remove();clearInterval(fall)}
-    },16)
-    }
-    setInterval(spawn,700)
-
-    /* ===== видео + попапы ===== */
-    const btn=document.getElementById('startBtn')
-    const vid=document.getElementById('vid')
-    const overlay=document.getElementById('overlay')
-    const mathPopup=document.getElementById('mathPopup')
-    const midPopup=document.getElementById('midPopup')
-    const finalPopup=document.getElementById('finalPopup')
-
-    btn.onclick=async()=>{
-    afterGame.style.display='none'
-    vid.style.display='block'
-    vid.muted=true
-    await vid.play()
-    vid.muted=false
-
-    setTimeout(()=>{
-        vid.volume=.15
-        overlay.style.display='block'
-        overlay.style.opacity='1'
-        show(mathPopup)
-
-        setTimeout(()=>{
-        hide(mathPopup)
-        show(midPopup)
-
-        setTimeout(()=>{
-            hide(midPopup)
-            show(finalPopup)
-            setTimeout(startConfetti,2000)
-        },4000)
-
-        },5000)
-
-    },10000)
-    }
-
-    /* ===== confetti.js PARTY from bottom ===== */
-function startConfetti(){
-
-  const duration = 9 * 1000; // 3 секунды
-  const animationEnd = Date.now() + duration;
-  const defaults = { 
-    startVelocity: 45,
-    spread: 120,
-    ticks: 300,
-    zIndex: 9999
-  };
-  
-  function randomInRange(min, max) {
-    return Math.random() * (max - min) + min;
-  }
-
-  const interval = setInterval(function() {
-
-    const timeLeft = animationEnd - Date.now();
-
-    if (timeLeft <= 0) {
-      return clearInterval(interval);
-    }
-
-    // left и right части, чтобы было громко и красиво
-    confetti(Object.assign({}, defaults, {
-      particleCount: 8,
-      origin: { x: randomInRange(0, 1), y: 1 },
-      angle: randomInRange(75, 105),
-      scalar: randomInRange(0.8, 1.4)
-    }));
-
-    confetti(Object.assign({}, defaults, {
-      particleCount: 8,
-      origin: { x: randomInRange(0, 1), y: 1 },
-      angle: randomInRange(250, 285),
-      scalar: randomInRange(0.8, 1.4)
-    }));
-
-  }, 250);
+<style>
+html,body{
+margin:0;
+height:100%;
+overflow:hidden;
+overscroll-behavior:none;
+touch-action:none;
+background:#0b0b0b;
+font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+color:white;
 }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-    </body>
-    </html>
+
+/* ================= ОБЩИЕ КНОПКИ ================= */
+.bigBtn{
+width:85%;
+height:26dvh;
+font-size:30px;
+font-weight:700;
+border-radius:30px;
+border:none;
+background:linear-gradient(135deg,#fff,#e8e8e8);
+color:black;
+box-shadow:0 15px 40px rgba(0,0,0,.6);
+}
+
+/* 🎁 трясётся только иконка */
+.giftIcon{
+display:inline-block;
+animation:shake 2s infinite ease-in-out;
+}
+
+@keyframes shake{
+0%,100%{transform:rotate(0)}
+25%{transform:rotate(-8deg)}
+50%{transform:rotate(6deg)}
+75%{transform:rotate(-6deg)}
+}
+
+/* ================= INTRO ================= */
+#introScreen{
+position:fixed;
+inset:0;
+display:flex;
+align-items:center;
+justify-content:center;
+background:radial-gradient(circle,#1a1a1a,#000);
+}
+
+/* ================= GAME ================= */
+#gameScreen{
+display:none;
+position:fixed;
+inset:0;
+background:#000;
+}
+
+#gameText{
+position:absolute;
+top:20px;
+width:100%;
+text-align:center;
+font-size:22px;
+}
+
+#bucket{
+position:absolute;
+bottom:25px;
+width:110px;
+height:70px;
+background:linear-gradient(#caa472,#a37b49);
+border-radius:20px 20px 30px 30px;
+box-shadow:0 10px 25px rgba(0,0,0,.6);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:36px;
+}
+
+.fall{
+position:absolute;
+font-size:32px;
+}
+
+/* ================= AFTER GAME ================= */
+#afterGame{
+display:none;
+position:fixed;
+inset:0;
+align-items:center;
+justify-content:center;
+background:radial-gradient(circle,#1a1a1a,#000);
+}
+
+/* ================= VIDEO ================= */
+video{
+display:none;
+position:fixed;
+inset:0;
+width:100vw;
+height:100dvh;
+object-fit:contain;
+background:black;
+}
+
+/* ================= OVERLAY ================= */
+#overlay{
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.75);
+backdrop-filter:blur(8px);
+opacity:0;
+transition:.4s;
+z-index:5;
+}
+
+/* ================= POPUPS ================= */
+.popup{
+display:none;
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%) scale(.85);
+width:90%;
+max-width:420px;
+padding:28px;
+background:white;
+color:black;
+border-radius:26px;
+text-align:center;
+opacity:0;
+transition:.35s;
+z-index:10;
+}
+
+.popup.show{
+opacity:1;
+transform:translate(-50%,-50%) scale(1);
+}
+
+.answers{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+margin-top:15px;
+}
+
+.answers button{
+padding:10px;
+border:none;
+border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- INTRO -->
+<div id="introScreen">
+<button id="openGameBtn" class="bigBtn">Открыть 🎁</button>
+</div>
+
+<!-- GAME -->
+<div id="gameScreen">
+<div id="gameText">Поймай 8 подарков 🎁</div>
+<div id="bucket">🧺</div>
+</div>
+
+<!-- AFTER GAME -->
+<div id="afterGame">
+<button id="startBtn" class="bigBtn">
+<span class="giftIcon">🎁</span> Открыть последнюю коробку
+</button>
+</div>
+
+<!-- VIDEO -->
+<video id="vid" playsinline>
+<source src="./video.mp4" type="video/mp4">
+</video>
+
+<div id="overlay"></div>
+
+<!-- POPUPS -->
+<div id="mathPopup" class="popup">
+<h2>Подожди…</h2>
+<p style="opacity:.7">Реши пример чтобы продолжить</p>
+log₂(256) × √144 + 7³ − (15 ÷ 3) =
+<div class="answers">
+<button>42</button><button>128</button>
+<button>731</button><button>96</button>
+<button>512</button><button>37</button>
+<button>404</button><button>81</button>
+</div>
+</div>
+
+<div id="midPopup" class="popup">
+Ладно… 😅<br>Не буду грузить математикой
+</div>
+
+<div id="finalPopup" class="popup">
+Ты точно внимательно посмотрела<br><b>ВСЕ коробки?</b> 🎁
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+<script>
+function show(el){el.style.display='block';requestAnimationFrame(()=>el.classList.add('show'))}
+function hide(el){el.classList.remove('show');setTimeout(()=>el.style.display='none',300)}
+
+function vibe(p){ if(navigator.vibrate) navigator.vibrate(p) }
+
+/* ================= FAKE LOADING ================= */
+function fakeLoading(next){
+const div=document.createElement('div')
+div.style.cssText="position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:22px;z-index:30"
+div.innerHTML=`🎁 Распаковываю подарок...
+<div style="width:70%;height:8px;background:#333;margin-top:20px;border-radius:10px;overflow:hidden">
+<div id="bar" style="height:100%;width:0;background:#fff"></div></div>`
+document.body.appendChild(div)
+
+let w=0
+const t=setInterval(()=>{
+w+=5
+div.querySelector('#bar').style.width=w+'%'
+if(w>=100){clearInterval(t);div.remove();next()}
+},40)
+}
+
+/* ================= FAKE ERROR ================= */
+function fakeError(next){
+const d=document.createElement('div')
+d.className='popup show'
+d.style.display='block'
+d.innerHTML='❌ Ошибка<br><br>Подарок не найден<br><small>Исправляю…</small>'
+document.body.appendChild(d)
+
+setTimeout(()=>{d.remove();next()},900)
+}
+
+/* ================= GAME LOGIC ================= */
+const intro=openGameBtn.closest('#introScreen')
+const game=document.getElementById('gameScreen')
+const bucket=document.getElementById('bucket')
+const afterGame=document.getElementById('afterGame')
+
+openGameBtn.onclick=()=>{
+vibe(40)
+intro.style.display='none'
+game.style.display='block'
+}
+
+let caught=0
+let bucketX=innerWidth/2-55
+bucket.style.left=bucketX+'px'
+
+function move(x){bucketX=x-55;bucket.style.left=bucketX+'px'}
+game.ontouchmove=e=>move(e.touches[0].clientX)
+game.onmousemove=e=>move(e.clientX)
+
+function spawn(){
+const el=document.createElement('div')
+el.className='fall'
+el.textContent='🎁'
+el.style.left=Math.random()*innerWidth+'px'
+el.style.top='-30px'
+game.appendChild(el)
+
+let y=0
+const fall=setInterval(()=>{
+y+=4
+el.style.top=y+'px'
+if(y>innerHeight-100){
+const ex=parseFloat(el.style.left)
+if(ex>bucketX&&ex<bucketX+110){
+caught++
+el.remove()
+clearInterval(fall)
+if(caught>=8){
+game.style.display='none'
+afterGame.style.display='flex'
+}
+}}
+if(y>innerHeight){el.remove();clearInterval(fall)}
+},16)
+}
+setInterval(spawn,700)
+
+/* ================= VIDEO FLOW ================= */
+const btn=document.getElementById('startBtn')
+const vid=document.getElementById('vid')
+const overlay=document.getElementById('overlay')
+const mathPopup=document.getElementById('mathPopup')
+const midPopup=document.getElementById('midPopup')
+const finalPopup=document.getElementById('finalPopup')
+
+btn.onclick=()=>{
+vibe([40,30,80])
+afterGame.style.display='none'
+
+fakeLoading(()=>{
+fakeError(async()=>{
+
+vid.style.display='block'
+vid.muted=true
+await vid.play()
+vid.muted=false
+
+setTimeout(()=>{
+vid.volume=.15
+overlay.style.display='block'
+overlay.style.opacity='1'
+
+show(mathPopup)
+
+setTimeout(()=>{
+hide(mathPopup)
+show(midPopup)
+
+setTimeout(()=>{
+hide(midPopup)
+show(finalPopup)
+vibe([120,40,120,40,200])
+startConfetti()
+},4000)
+
+},5000)
+
+},10000)
+
+})
+})
+}
+
+/* ================= CONFETTI ================= */
+function startConfetti(){
+const duration=4000
+const end=Date.now()+duration
+
+const interval=setInterval(()=>{
+if(Date.now()>end)return clearInterval(interval)
+
+confetti({
+particleCount:14,
+startVelocity:50,
+spread:120,
+origin:{x:Math.random(),y:1}
+})
+},200)
+}
+</script>
+
+</body>
+</html>
