@@ -303,89 +303,48 @@
     },10000)
     }
 
-    /* ===== ADVANCED CONFETTI (burst + swirl) ===== */
-    const canvas=document.getElementById('confetti')
-    const ctx=canvas.getContext('2d')
+    /* ===== confetti.js PARTY from bottom ===== */
+function startConfetti(){
 
-    let pieces=[]
-    let animId
+  const duration = 9 * 1000; // 3 секунды
+  const animationEnd = Date.now() + duration;
+  const defaults = { 
+    startVelocity: 45,
+    spread: 120,
+    ticks: 300,
+    zIndex: 9999
+  };
+  
+  function randomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
 
-    const emojis=['✨','⭐']
+  const interval = setInterval(function() {
 
-    function resize(){
-    canvas.width=innerWidth
-    canvas.height=innerHeight
-    }
-    resize()
-    onresize=resize
+    const timeLeft = animationEnd - Date.now();
 
-    function startConfetti(){
-
-    cancelAnimationFrame(animId)
-    pieces=[]
-
-    const cx=canvas.width/2
-    const cy=canvas.height/2
-
-    // 💥 создаём "взрыв"
-    for(let i=0;i<220;i++){
-        const angle=Math.random()*Math.PI*2
-        const speed=4+Math.random()*7
-
-        pieces.push({
-        x:cx,
-        y:cy,
-        vx:Math.cos(angle)*speed,
-        vy:Math.sin(angle)*speed,
-        size:18+Math.random()*22,
-        rotation:Math.random()*6,
-        spin:(Math.random()-.5)*0.2,
-        gravity:.08,
-        life:1,
-        emoji:emojis[Math.floor(Math.random()*emojis.length)]
-        })
+    if (timeLeft <= 0) {
+      return clearInterval(interval);
     }
 
-    const start=Date.now()
+    // left и right части, чтобы было громко и красиво
+    confetti(Object.assign({}, defaults, {
+      particleCount: 8,
+      origin: { x: randomInRange(0, 1), y: 1 },
+      angle: randomInRange(75, 105),
+      scalar: randomInRange(0.8, 1.4)
+    }));
 
-    function draw(){
-        ctx.clearRect(0,0,canvas.width,canvas.height)
+    confetti(Object.assign({}, defaults, {
+      particleCount: 8,
+      origin: { x: randomInRange(0, 1), y: 1 },
+      angle: randomInRange(250, 285),
+      scalar: randomInRange(0.8, 1.4)
+    }));
 
-        pieces.forEach(p=>{
-
-        // физика
-        p.vy+=p.gravity
-        p.x+=p.vx
-        p.y+=p.vy
-
-        // лёгкий вихрь
-        const dx=p.x-cx
-        const dy=p.y-cy
-        p.vx+=(-dy)*0.0005
-        p.vy+=(dx)*0.0005
-
-        p.rotation+=p.spin
-        p.life-=0.008
-
-        ctx.save()
-        ctx.globalAlpha=Math.max(p.life,0)
-        ctx.translate(p.x,p.y)
-        ctx.rotate(p.rotation)
-        ctx.font=p.size+'px serif'
-        ctx.fillText(p.emoji,0,0)
-        ctx.restore()
-        })
-
-        pieces=pieces.filter(p=>p.life>0)
-
-        if(pieces.length>0){
-        animId=requestAnimationFrame(draw)
-        }
-    }
-
-    draw()
-    }
+  }, 250);
+}
     </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     </body>
     </html>
