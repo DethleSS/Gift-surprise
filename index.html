@@ -308,61 +308,71 @@ if(y>innerHeight){el.remove();clearInterval(fall)}
 setInterval(spawn,700)
 
 /* ================= VIDEO FLOW (FIX iPhone) ================= */
-const preVideo=document.getElementById('preVideo')
-const realStartBtn=document.getElementById('realStartBtn')
+
+const preVideo = document.getElementById('preVideo')
+const realStartBtn = document.getElementById('realStartBtn')
 const btn = document.getElementById('startBtn')
 const vid = document.getElementById('vid')
 const overlay = document.getElementById('overlay')
 const mathPopup = document.getElementById('mathPopup')
 const midPopup = document.getElementById('midPopup')
 const finalPopup = document.getElementById('finalPopup')
-btn.onclick=()=>{
-vibe([40,30,80])
-afterGame.style.display='none'
 
-fakeLoading(()=>{
-fakeError(()=>{
+btn.onclick = () => {
 
-// ❗ вместо автозапуска показываем кнопку
-preVideo.style.display='flex'
+  vibe([40,30,80])
 
-})
-})
+  afterGame.style.display = 'none'
+
+  /* 🔒 ГАРАНТИРОВАННО скрываем кнопку заранее */
+  preVideo.style.display = 'none'
+
+  fakeLoading(()=>{
+    fakeError(()=>{
+
+      /* 🔥 показываем ТОЛЬКО после полного удаления popup */
+      requestAnimationFrame(()=>{
+        preVideo.style.display = 'flex'
+      })
+
+    })
+  })
 }
 
-/* 🔥 только этот клик запускает видео */
-realStartBtn.onclick=async()=>{
 
-vibe([60,40,120])
+/* 🔥 только этот клик реально запускает видео */
+realStartBtn.onclick = async () => {
 
-preVideo.style.display='none'
+  vibe([60,40,120])
 
-vid.style.display='block'
-vid.muted=false
-await vid.play()
+  preVideo.style.display = 'none'
 
-setTimeout(()=>{
+  vid.style.display = 'block'
+  vid.muted = false
+  await vid.play()
 
-vid.volume=.15
-overlay.style.display='block'
-overlay.style.opacity='1'
+  setTimeout(()=>{
 
-show(mathPopup)
+    vid.volume = .15
+    overlay.style.display='block'
+    overlay.style.opacity='1'
 
-setTimeout(()=>{
-hide(mathPopup)
-show(midPopup)
+    show(mathPopup)
 
-setTimeout(()=>{
-hide(midPopup)
-show(finalPopup)
-vibe([120,40,120,40,200])
-startConfetti()
-},4000)
+    setTimeout(()=>{
+      hide(mathPopup)
+      show(midPopup)
 
-},5000)
+      setTimeout(()=>{
+        hide(midPopup)
+        show(finalPopup)
+        vibe([120,40,120,40,200])
+        startConfetti()
+      },4000)
 
-},10000)
+    },5000)
+
+  },10000)
 }
 
 /* ================= CONFETTI ================= */
